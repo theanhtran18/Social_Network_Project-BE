@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị mạng xã hội</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #444;
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+        }
+        .btn {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bảng điều khiển Quản trị viên</h1>
+    </header>
+    <nav>
+        <a href="#users">Quản lý người dùng</a>
+        <a href="#posts">Quản lý bài viết</a>
+        <a href="#reports">Báo cáo vi phạm</a>
+    </nav>
+    <div class="container">
+        <!-- Quản lý người dùng -->
+        <section id="users">
+            <h2>Người dùng</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.getUserID()}"></td>
+                        <td th:text="${user.firstName + ' ' + user.lastName}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.accounNonLocked ? 'Hoạt động' : 'Khóa'}"></td>
+                        <td>
+                            <form th:action="@{/admin/lockUser/{id}(id=${user.getUserID()})}" method="post">
+                                <button type="submit" class="btn">Khóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+               
+            </table>
+        </section>
+
+        <!-- Quản lý bài viết -->
+        <section id="posts">
+            <h2>Bài viết</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Người dùng</th>
+                        <th>Nội dung</th>
+                        <th>Ngày đăng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="post : ${posts}">
+                        <td th:text="${post.getId()}"></td>
+                        <td th:text="${post.user.firstName + ' ' + post.user.lastName}"></td>
+                        <td th:text="${post.content}"></td>
+                        <td>
+                            <img th:src="${post.image}" alt="Ảnh bài viết" style="max-width: 100px; max-height: 100px;">
+                        </td>
+                        <td th:text="${post.createdAt}"></td>
+                        
+                        <td>
+                            <form th:action="@{/admin/deletepost/{postId}(postId=${post.getId()})}" method="post">
+                                <button type="submit" class="btn">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Báo cáo vi phạm -->
+        <section id="reports">
+            <h2>Báo cáo vi phạm</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Loại vi phạm</th>
+                        <th>Người báo cáo</th>
+                        <th>Chi tiết</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                
+                </tbody>
+            </table>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="shortcut icon" href="/images/logo1.png" type="image/x-icon">
+	<title>Zabook.com</title>
+
+	<!-- style css link -->
+	<link rel="stylesheet" href="/css/style.css">
+	<!-- fontawesome css link -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+		integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="https://cdn.jsdelivr.net/npm/@feathericons/feather@4.28.0/dist/feather.min.css" rel="stylesheet">
+	<style>
+		.modal1 {
+			display: none;
+			/* Ẩn ban đầu */
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.8);
+			/* Nền tối mờ */
+			z-index: 1000;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.modal1 .story-content1 {
+			position: relative;
+			width: 40%;
+			max-width: 600px;
+			height: 80%;
+			background: #fff;
+			border-radius: 10px;
+			overflow: hidden;
+			text-align: center;
+		}
+
+		.modal1 img,
+		.modal1 video {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.modal1 p {
+			position: absolute;
+			bottom: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			color: #fff;
+			text-shadow: 0 1px 8px black;
+			font-size: 18px;
+		}
+
+		.close-btn1 {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			font-size: 30px;
+			color: #fff;
+			cursor: pointer;
+			z-index: 1001;
+		}
+
+		.love {
+			color: black;
+			cursor: pointer;
+		}
+
+		.love.liked {
+			color: red;
+		}
+
+		#like-text {
+			cursor: pointer;
+		}
+
+		/* Popup container */
+		.popup-user {
+			display: none;
+			/* Ẩn popup mặc định */
+			position: fixed;
+			z-index: 1000;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			width: 400px;
+			/* Chiều rộng cố định */
+			max-width: 90%;
+			/* Tối ưu cho màn hình nhỏ */
+			background-color: white;
+			/* Nền trắng */
+			border-radius: 10px;
+			/* Bo góc */
+			box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+			/* Đổ bóng */
+			overflow: hidden;
+			/* Ẩn phần dư thừa */
+			max-height: 80%;
+			/* Chiều cao tối đa của popup */
+			border-color: black;
+		}
+
+		/* Nội dung bên trong popup */
+		.popup-content {
+			padding: 20px;
+			/* Khoảng cách bên trong */
+			position: relative;
+			text-align: center;
+			border: #cccccc8f 1px solid;
+		}
+
+		/* Nút đóng popup */
+		#close-user-list {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			font-size: 30px;
+			font-weight: bold;
+			color: #333;
+			/* Màu chữ */
+			cursor: pointer;
+			background: none;
+			border: none;
+			z-index: 1001;
+		}
+
+		/* Danh sách người thích */
+		#like-list {
+			list-style: none;
+			/* Xóa dấu đầu dòng */
+			padding: 0;
+			margin: 20px 0 0;
+			max-height: 300px;
+			/* Chiều cao tối đa cho danh sách */
+			overflow-y: auto;
+			/* Thêm thanh cuộn dọc khi nội dung quá dài */
+		}
+
+		/* Các mục trong danh sách */
+		#like-list li {
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			/* Căn trái nội dung */
+			padding: 10px;
+			border-bottom: 1px solid #ddd;
+			/* Đường kẻ chia các mục */
+		}
+
+		/* Ảnh đại diện */
+		#like-list li img {
+			width: 40px;
+			/* Kích thước ảnh đại diện */
+			height: 40px;
+			object-fit: cover;
+			border-radius: 50%;
+			/* Bo tròn ảnh */
+			margin-right: 10px;
+		}
+
+		/* Tên người dùng */
+		#like-list li span {
+			flex-grow: 1;
+			text-align: left;
+			/* Căn trái tên người dùng */
+		}
+
+		/* Nút show-user-like */
+		#show-user-like {
+			background: none;
+			border-color: transparent;
+			width: 30px;
+		}
+
+		/* Đảm bảo ảnh trong popup có kích thước phù hợp */
+		.popup-user #img {
+			width: 40px;
+		}
+		
+		
+		.post-images {
+		    max-width: 100%;
+		}
+
+		.scroll-container {
+		    display: flex;
+		    flex-direction: column; /* Hiển thị theo chiều dọc */
+		    overflow-y: auto; /* Tạo thanh cuộn dọc */
+		    max-height: 500px; /* Giới hạn chiều cao để kích hoạt thanh cuộn */
+		    gap: 10px;
+		    padding: 10px;
+		    border: 1px solid #ddd;
+		    border-radius: 10px;
+		}
+
+		.image-item img {
+		    max-width: 100%; /* Đảm bảo ảnh co giãn theo chiều rộng */
+		    height: auto;
+		    border-radius: 10px;
+		}
+
+		.video-item video {
+		    max-width: 100%;
+		    border-radius: 10px;
+		}
+
+		
+		
+	</style>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.4/stomp.min.js"></script>
+</head>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Đặt giá trị message vào thuộc tính data-message -->
+<span id="message" th:text="${message}" style="display:none"></span>
+
+<script>
+	// Truy cập giá trị message từ phần tử span
+	const message = document.getElementById('message').textContent;
+	if (message && message.trim() !== '') {
+		alert(message);  // Hiển thị thông báo
+	}
+</script>
+
+
+<!--
+<c:if test="${not empty message}">
+    <script>
+        Swal.fire({
+            title: 'Thông báo',
+            text: "<c:out value='${message}' />",
+            icon: 'warning',
+            confirmButtonText: 'OK'
+        })
+    </script>
+</c:if>
+-->
+
+<body>
+
+	<!-- header section start -->
+
+
+	<header>
+		<div class="header-container">
+			<div class="header-wrapper">
+				<div class="logoBox">
+					<img src="/images/th.png" alt="logo">
+				</div>
+				<div class="searchBox">
+					<input type="search">
+
+					<a href="/friendships">
+						<i class="fas fa-search"></i>
+					</a>
+
+				</div>
+				<!-- Navigation Icons -->
+				<div class="iconBox1">
+					<a href="/user/"><i class="fa-solid fa-house"></i></a>
+					<a href="/user/inviteFriend"><i class="fa-solid fa-user-group"></i></a>
+					<a href="/user/video"><i class="fa-solid fa-video"></i></a>
+					<a href="/user/games"><i class="fa-solid fa-gamepad"></i></a>
+				</div>
+
+				<!-- User Options -->
+				<div class="iconBox2">
+					<a href="#"><i class="fa-solid fa-circle-plus"></i></a>
+					<a href="#"><i class="fa-brands fa-facebook-messenger"></i></a>
+					<a href="javascript:void(0);" id="notificationBell" class="notification-Bell"><i
+							class="fa-solid fa-bell"></i></a>
+					<a class="profile" style="margin-bottom: 0px; width: auto; height: auto;" href="/user/profile"><img
+							th:src="${currentuser.avatar != null} ? ${currentuser.avatar} : '/images/icon/person.svg'"
+							alt="user"></a>
+					<div id="dropdownMenu" class="dropdown-menu2 dropdown-menu-end" style="display: none;"
+						aria-labelledby="accountDropdown">
+						<ul>
+							<li><a class="dropdown-item" href="/user/profile">Trang cá nhân</a></li>
+							<li><a class="dropdown-item" href="/fanpage">Fanpage</a></li>
+							<li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+						</ul>
+					</div>
+					<div class="notification-wrapper">
+
+
+						<!-- Dropdown để hiển thị thông báo -->
+						<div id="notificationDropdown" class="notification-dropdown ">
+							<ul id="notificationList">
+								<th:block th:each="notification : ${notifications}">
+									<li>
+										<span th:text="${notification.senderName}">Tên người gửi</span>
+										<span th:text="${notification.content}">Nội dung thông báo</span>
+										<span th:text="${notification.time}">Thời gian</span>
+									</li>
+								</th:block>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	</header>
+
+	<!-- header section end -->
+	<!-- home section start -->
+
+
+	<div class="home">
+		<div class="container">
+			<div class="home-weapper">
+
+				<!-- home left start here -->
+				<div class="home-left">
+
+					<div class="profile">
+						<a href="/user/profile">
+							<img th:src="${currentuser.avatar != null} ? ${currentuser.avatar} : '/images/icon/person.svg'"
+								alt="Profile Picture">
+
+							<h3 th:text="${currentuser.lastName}"></h3>
+						</a>
+
+					</div>
+
+					<div class="pages">
+						<h4 class="mini-headign">Pages</h4>
+						<a href="">
+							<label style="cursor: pointer;">
+								<img src="/images/messenger.png" alt="messenger">
+								<span>messenger</span>
+							</label>
+						</a>
+						<a href="">
+							<label>
+								<img src="/images/instagram.png" alt="instagram">
+								<span>instagram</span>
+							</label>
+						</a>
+
+						<button class="see-more-btn">See more <i class="fa-solid fa-angle-down"></i></button>
+					</div>
+
+					<div class="group">
+						<h4 class="mini-headign">Group</h4>
+						<label>
+							<img src="/images/gg.png" alt="group01">
+							<span>Graphic design</span>
+						</label>
+
+						<label>
+							<img src="/images/gg2.png" alt="group02">
+							<span>website design</span>
+						</label>
+
+						<label>
+							<img src="/images/gg3.png" alt="group03">
+							<span>ZED.zahidul</span>
+						</label>
+
+						<button class="see-more-btn">See more <i class="fa-solid fa-angle-down"></i></button>
+					</div>
+
+					<div class="games">
+						<h4 class="mini-headign">Games</h4>
+						<label>
+							<img src="/images/game.png" alt="game01">
+							<span>Facebook games</span>
+						</label>
+						<label>
+							<img src="images/game2.png" alt="game02">
+							<span>Free Play Games</span>
+						</label>
+						<button class="see-more-btn">See more <i class="fa-solid fa-angle-down"></i></button>
+					</div>
+
+					<div class="explore">
+						<h4 class="mini-headign">Explore</h4>
+
+						<a href="#"><i class="fa-solid fa-user-group"></i> Group</a>
+						<a href="#"><i class="fa-solid fa-star"></i></i> Favorites</a>
+						<a href="#"><i class="fa-solid fa-bookmark"></i></i> Saves</a>
+						<a href="#"><i class="fa-solid fa-clock"></i> Events</a>
+						<a href="#"><i class="fa-solid fa-flag"></i> Pages</a>
+
+						<button class="see-more-btn">See more <i class="fa-solid fa-angle-down"></i></button>
+					</div>
+
+				</div><!-- home left end here -->
+
+				<!-- home center start here -->
+
+				<div class="home-center">
+					<div class="home-center-wrapper">
+						<div class="stories">
+							<h3 class="mini-headign">Stories</h3>
+							<div class="stories-wrapper">
+
+								<div class="single-stories" onclick="showPopup()">
+									<label>
+
+										<img th:src="${currentuser.avatar != null} ? ${currentuser.avatar} : '/images/avatar.jpg'"
+											alt="user-avatar">
+									</label>
+									<div>
+										<img th:src="${currentuser.avatar != null} ? ${currentuser.avatar} : '/images/avatar.jpg'"
+											alt="user-avatar">
+
+										<i class="fa-solid fa-circle-plus"></i>
+										<b>Create Stories</b>
+									</div>
+								</div>
+								<!-- Ảnh đại diện nhỏ -->
+								<div class="single-stories" th:each="story, i : ${stories}"
+									th:onclick="|openStory(${i.index})|">
+									<label>
+										<a
+											th:href="@{'/user/profile/' + ${story.user != null ? story.getUser().getUserID() : 0}}">
+											<img th:src="@{${story.user != null ? story.user.getAvatar() : '/images/avatar.jpg'}}"
+												alt="user-avatar" class="img-fluid"
+												style="width: 50px; height: 50px; border-radius: 50%;">
+										</a>
+									</label>
+									<div>
+										<img th:if="${story.image != null}" th:src="@{${story.image}}"
+											alt="story-image">
+										<p th:if="${story.textContent != null}" th:text="${story.textContent}"></p>
+										<b
+											th:text="${story.user != null ? story.getUser().getFirstName() + ' ' + story.getUser().getLastName() : 'Unknown User'}">User
+											Name</b>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="createPost">
+							<form action="/user/post/create" method="post" enctype="multipart/form-data">
+
+
+								<h3 class="mini-headign">Create Post</h3>
+								<div class="post-text">
+
+
+									<img th:src="${currentuser.avatar != null} ? ${currentuser.avatar} : '/images/avatar.jpg'"
+										alt="user-avatar">
+
+									<input type="text-area" placeholder="Bạn đang nghĩ gì thế?" name="content">
+								</div>
+
+								<!-- Previews -->
+								<div id="previewSection" style="margin-top: 10px;">
+
+									<div id="galleryPreview" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+
+
+									<div id="videoPreview" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+								</div>
+
+
+								<div class="post-icon">
+
+									<!-- Gallery Upload -->
+									<label for="galleryInput" class="upload-label gallery">
+										<i class="upload-icon gallery-icon fa-solid fa-camera"></i> Gallery
+									</label>
+
+									<input type="file" id="galleryInput" name="images" accept="image/*" multiple
+										style="display: none;"
+										onchange="previewFiles('galleryPreview', 'galleryInput', 'image')">
+
+									<!-- Video Upload -->
+									<label for="videoInput" class="upload-label video">
+										<i class="upload-icon video-icon fa-solid fa-video"></i> Video
+									</label>
+									<input type="file" id="videoInput" name="videos" accept="video/*" multiple
+										style="display: none;"
+										onchange="previewFiles('videoPreview', 'videoInput', 'video')">
+
+
+
+									<button type="submit" class="upload-label button"> Đăng</button>
+								</div>
+
+							</form>
+						</div>
+						<div id="post-container">
+
+							<div th:each="post : ${posts}">
+								<div class="fb-post1">
+									<div class="fb-post1-container" data-post-id="${post.id}">
+										<div class="fb-post1-header"></div>
+										<div class="fb-p1-main">
+											<div class="post-title">
+												<a th:href="@{'/user/profile/' + ${post.user != null ? post.getUser().getUserID() : 0}}"><img th:src="${post?.user?.avatar != null ? post.user.avatar : '/images/default-avatar.png'}"
+													alt="user picture"> </a>
+												
+												<ul>
+													<li>
+														<h3>
+															<a th:href="@{'/user/profile/' + ${post.user != null ? post.getUser().getUserID() : 0}}"> <h4 style="display: inline;"
+																th:text="${post?.user != null ? post.user.firstName + ' ' + post.user.lastName : 'Unknown User'}">
+															</h4></a>
+															
+															<h4 style="display: inline;" th:if="${post?.isShared}"> - Đã
+																chia sẻ bài viết</h4>
+														</h3>
+													</li>
+													<li><span
+															th:text="${post?.timeAgo != null ? post.timeAgo : ''}"></span>
+													</li>
+												</ul>
+
+												<p>
+													<span
+														th:if="${post?.contentShare != null && !post.contentShare.isEmpty()}"
+														th:text="${post.contentShare}"></span><br>
+												<div class="fb-post1-header"></div>
+												<span
+													th:if="${post?.contentShare != null && !post.contentShare.isEmpty()}"
+													class="gach"></span>
+												<span th:text="${post?.content != null ? post.content : ''}"></span>
+												</p>
+											</div>
+
+											<div class="post-images">
+											    <div class="post-images1">
+											        <ul class="scroll-container">
+											            <li th:each="image : ${post?.getImage()}">
+											                <div class="image-item">
+											                    <img th:if="${image?.linkImage != null}"
+											                        th:src="@{'/uploads/images/' + ${image.linkImage}}" />
+											                </div>
+											            </li>
+											            <li th:each="video : ${post?.video}">
+											                <div class="video-item">
+											                    <video th:if="${video?.linkVideo != null}"
+											                        th:src="@{'/uploads/videos/' + ${video.linkVideo}}"
+											                        controls width="100%" style="border-radius: 10px">
+											                        Trình duyệt của bạn không hỗ trợ thẻ video.
+											                    </video>
+											                </div>
+											            </li>
+											        </ul>
+											    </div>
+											</div>
+
+
+											<div class="like-comment">
+												<ul>
+													<li>
+														<button id="show-user-like" th:data-id="${post?.id}"
+															onclick="loadLikeListFromController(this)">
+															<img src="/images/love.png" alt="love">
+														</button>
+														<label class="like-count" id="like-count-${post.id}"
+															style="padding-bottom: 5px;" data-postId="${post.id}"
+															th:text="${#lists.isEmpty(post.likedUsers) ? 0 : #lists.size(post.likedUsers)}"></label>
+
+
+
+													</li>
+													<li style="width: 60%;"></li>
+													<li><span
+															th:text="${post?.getCommentCount() != null ? post.getCommentCount() : 0}"></span>bình
+														luận</li>
+													<li><span
+															th:text="${post?.shareCount != null ? post.shareCount : 0}"></span>chia
+														sẻ</li>
+												</ul>
+
+												<div class="post-actions">
+													<button th:if="${post?.likedUsers?.contains(user)}"
+														data-updateLike="#like-count-${post?.id}" class="btn-like"
+														th:data-postId="${post?.id}" onclick="toggleLike(this)">
+														<i class="fas fa-heart love liked"></i>
+														<span id="like-text" style="color: red;"> Thích</span>
+													</button>
+													<button
+														th:if="${post?.likedUsers == null || !post.likedUsers.contains(user)}"
+														data-updateLike="#like-count-${post?.id}" class="btn-like"
+														th:data-postId="${post?.id}" onclick="toggleLike(this)">
+
+														<i class="fas fa-heart love"></i>
+														<span id="like-text">Thích</span>
+													</button>
+
+
+													<button class="btn-comment" onclick="toggleCommentForm(this)"><i
+															class="fas fa-comment-alt"></i> Bình luận</button>
+													<button class="btn-share" onclick="toggleSharePopup(this)"
+														th:data-user="${post?.user?.firstName != null && post.user.lastName != null ? post.user.firstName + ' ' + post.user.lastName : 'Unknown User'}"
+														th:data-postid="${post?.id}">
+														<i class="fa-solid fa-share-from-square"></i> Chia sẻ
+													</button>
+
+
+													<!-- Form chia sẻ dạng Popup -->
+													<div class="share-popup" style="display: none;">
+														<div class="popup-content">
+															<span class="popup-close"
+																onclick="toggleSharePopup(this)">&times;</span>
+															<h3>Chia sẻ bài viết</h3>
+
+															<div class="share-header">
+																<img th:src="${user.avatar}" alt="User Avatar"
+																	class="user-avatar">
+																<h4 th:text="${user.firstName+' '+user.lastName}">
+																</h4>
+
+															</div>
+
+															<form action="/user/post/share" method="post">
+
+																<div class="share-textarea">
+																	<textarea placeholder="Bạn nghĩ gì về bài viết này?"
+																		name="content" rows="4"></textarea>
+																</div>
+																<div class="share-actions">
+
+																	<p id="share-postid" name="postId"
+																		style="display: none;"></p>
+																	<input type="hidden" name="postId"
+																		id="share-postid-input">
+																	<button class="btn-send">
+																		<i class="fas fa-arrow-right"></i> Chia sẻ
+																	</button>
+
+																	<button class="btn-cancel"
+																		onclick="toggleSharePopup(this)">Hủy</button>
+																</div>
+
+															</form>
+														</div>
+													</div>
+												</div>
+												<!--form bình luận-->
+												<div class="comment-form-container" style="display: none;">
+													<div>
+														<li
+															th:if="${post?.comment == null || #lists.isEmpty(post.comment)}">
+															<label>Chưa có bình luận nào!</label>
+														</li>
+														<li th:each="comment : ${post?.comment}">
+															<div class="comment-box">
+																<img class="avatar"
+																	th:if="${comment?.userComment?.avatar != null}"
+																	th:src="${comment.userComment.avatar}" alt="Avatar">
+																<div class="comment-content">
+																	<p><strong
+																			th:text="${comment?.userComment != null ? comment.userComment.firstName + ' ' + comment.userComment.lastName : 'Unknown User'}"></strong>
+																	</p>
+																	<p
+																		th:text="${comment?.content != null ? comment.content : ''}">
+																	</p>
+																	<div class="comment-actions">
+																		<span
+																			th:text="${comment?.getTimeAgo() != null ? comment.getTimeAgo() : ''}"></span>
+
+																		<div class="menu-container1">
+																			<button class="buttoncomment1"
+																				onclick="toggleMenu1(this)">
+																				<img width="67" height="67"
+																					src="https://img.icons8.com/external-others-inmotus-design/67/external-Menu-atm-others-inmotus-design-2.png"
+																					alt="menu" />
+																			</button>
+																			<div class="menu-options1" id="menu1">
+																				<button th:id="${comment.id}"
+																					th:data-content="${comment?.content != null ? comment.content : ''}"
+																					onclick="handleEdit1(this)">
+																					Chỉnh sửa
+																				</button>
+
+																				<button th:id="${comment.id}"
+																					onclick="handleDelete1(this)">Xóa</button>
+																			</div>
+
+																		</div>
+
+																	</div>
+																</div>
+															</div>
+														</li>
+
+													</div>
+
+													<div class="comment-bar">
+														<form action="/user/comments/addOrEdit" method="post"
+															class="comment-form">
+															<input type="hidden" id="postId" name="postId"
+																th:value="${post?.id}">
+															<input type="hidden" id="commentId" name="commentId"
+																th:value="${comment?.id != null ? comment.id : ''}">
+															<input type="text" id="contentInput" name="content"
+																th:value="${comment?.content != null ? comment.content : ''}"
+																placeholder="Viết bình luận...">
+															<button id="isendCommentBtn" type="submit">
+																<img class="img-send-comment" width="24" height="24"
+																	src="https://img.icons8.com/material-rounded/24/sent.png"
+																	alt="sent" />
+															</button>
+														</form>
+													</div>
+												</div>
+
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+
+						</div>
+
+
+
+					</div> <!-- home center wrapper end -->
+				</div> <!-- home center end -->
+
+
+				<!-- Popup hiển thị danh sách người thích -->
+				<div id="popup-like-list" class="popup-user">
+					<div class="popup-content">
+						<span class="close-user-list" id="close-user-list"
+							onclick="closePopupuser('popup-like-list')">×</span>
+						<h3 style="text-align: center;">
+							<img src="" id="img" alt="like">
+						</h3>
+						<ul id="like-list">
+
+							<!-- Danh sách người thích sẽ được thêm vào đây bằng JavaScript -->
+						</ul>
+
+					</div>
+				</div>
+				<div class="home-right">
+					<div class="home-right-wrapper">
+
+						<div class="event-friend">
+							<div class="event">
+								<h3 class="heading">Upcoming Events <span>see all</span></h3>
+								<img src="/images/eve.jpg" alt="event-img">
+								<div class="event-date">
+									<h3>21 <b>july</b></h3>
+									<h4>United state of America <span>New York City</span></h4>
+								</div>
+								<button><i class="fa-regular fa-star"></i> interested</button>
+							</div>
+
+							<hr>
+
+							<div class="friend">
+								<h3 class="heading">Friend Requests <span>see all</span></h3>
+								<ul>
+									<li><img ></li>
+									<li>
+										<b></b>
+										<p></p>
+										<button></button><button class="friend-remove"></button>
+									</li>
+								</ul>
+							</div>
+
+						</div>
+
+						<div class="create-page">
+							<ul>
+								<li>
+									<i class="fa-solid fa-circle-plus"></i>
+									<h4>Create Page & Groups</h4>
+									<i class="fa-solid fa-magnifying-glass"></i>
+								</li>
+								<li>
+									<img src="/images/group.jpg" alt="groups">
+								</li>
+								<li>
+									<b>simple group or page name <span>200k Members</span></b>
+									<button>Join Group</button>
+								</li>
+							</ul>
+						</div>
+
+
+					</div><!-- home right wrapper end -->
+				</div><!-- home right end -->
+
+
+
+
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<!-- home section end -->
+	<div id="popupOverlay" class="popup-overlay">
+		<div class="popup-form">
+			<span class="close-btn4" onclick="hidePopup()">&times;</span>
+			<h3>Tạo Story mới</h3>
+
+			<!-- Lựa chọn loại Story -->
+			<div>
+				<label>
+					<input type="radio" name="storyType" value="text" onchange="toggleStoryType()" checked> Đăng Nội
+					dung
+				</label>
+				<label>
+					<input type="radio" name="storyType" value="media" onchange="toggleStoryType()"> Đăng Hình ảnh/Video
+				</label>
+			</div>
+
+			<!-- Form tạo Story -->
+			<form th:action="@{/user/story/createStory}" method="post" enctype="multipart/form-data"
+				onsubmit="return validateStoryForm(event)">
+				<!-- Phần nhập nội dung văn bản -->
+				<div id="textStory" style="margin-top: 10px;">
+					<label for="textContent">Nội dung Story:</label>
+					<textarea id="textContent" name="textContent" rows="4" placeholder="Nhập nội dung..."></textarea>
+				</div>
+
+				<!-- Phần tải lên hình ảnh hoặc video -->
+				<div id="mediaStory" style="display: none; margin-top: 10px;">
+					<label for="mediaFile">Hình ảnh hoặc Video:</label>
+					<input type="file" id="mediaFile" name="file" accept="image/*,video/*"
+						onchange="previewMedia(event)">
+
+					<!-- Khu vực xem trước -->
+					<div id="previewContainer">
+						<img id="imagePreview" src="#" alt="Image Preview">
+						<video id="videoPreview" controls></video>
+					</div>
+				</div>
+
+				<br><br>
+				<button type="submit">Đăng Story</button>
+			</form>
+		</div>
+	</div>
+	<div>
+		<div id="storyModal" class="story-modal">
+			<span class="close-btn3" onclick="closeStory()">×</span>
+			<div class="story-content">
+				<!-- Thông tin người dùng: Avatar và thời gian -->
+				<div class="story-header">
+					<img id="modalAvatar" class="story-avatar" src="" alt="user-avatar">
+					<div class="story-info">
+						<b id="modalUserName">User Name</b>
+						<span id="modalTime">Time</span>
+					</div>
+				</div>
+				<img id="modalImage" src="" alt="story-image">
+				<video id="modalVideo" autoplay muted loop style="display:none;"></video>
+				<p id="modalText"></p>
+			</div>
+
+			<!-- Nút chuyển story -->
+			<div class="story-nav left" onclick="prevStory()">&#10094;</div>
+			<div class="story-nav right" onclick="nextStory()">&#10095;</div>
+		</div>
+	</div>
+	<!-- JavaScript -->
+	<script th:inline="javascript">
+		let currentStoryIndex = 0;
+		let stories = /*[[${stories}]]*/[];
+		stories = stories.map(story => {
+			return {
+				avatar: story.user != null ? story.user.avatar : '/images/avatar.jpg',
+				userName: story.user != null ? story.user.lastName + ' ' + story.user.firstName : 'Unknown User',
+				time: story.timestamp || 'Unknown Time',
+				image: story.image || null,
+				video: story.video || null,
+				textContent: story.textContent || ''
+			};
+		});
+
+		// Đảm bảo modal được ẩn khi trang được load lại
+		document.addEventListener("DOMContentLoaded", function () {
+			const modal = document.getElementById('storyModal');
+			if (modal) {
+				modal.style.display = 'none'; // Ẩn modal khi trang load xong
+			}
+		});
+		const notificationBell = document.getElementById("notificationBell");
+
+		notificationBell.addEventListener("click", function (event) {
+			event.stopPropagation(); // Ngăn chặn sự kiện nổi bọt
+			notificationDropdown.classList.toggle("show"); // Toggle class 'show'
+			log.console.log("Show notification dropdown");
+		});
+
+
+		//tải thêm post
+
+
+	</script>
+	<script src="/js/index.js"></script>
+
+</body>
+
+
+</html>
