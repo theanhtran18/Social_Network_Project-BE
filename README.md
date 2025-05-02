@@ -26,7 +26,7 @@ Zabook là một mạng xã hội đơn giản được phát triển với mụ
 1. **Clone dự án về máy của bạn**:
 
     ```bash
-    git clone https://github.com/ThanhAn333/Social_Network_Project
+    git clone https://github.com/theanhtran18/Social_Network_Project-BE.git
     ```
 
 2. **Cài đặt các phụ thuộc**:
@@ -58,8 +58,8 @@ Zabook là một mạng xã hội đơn giản được phát triển với mụ
 
         spring.mail.host=smtp.gmail.com
         spring.mail.port=587
-        spring.mail.username=nguyenthanhan26.qngai@gmail.com
-        spring.mail.password=dwoa swhj iitp rlzl
+        spring.mail.username=theanh0343@gmail.com
+        spring.mail.password=fwfk honf hkmb ferr
         spring.mail.protocol=smtp
         spring.mail.properties.mail.smtp.auth=true
         spring.mail.properties.mail.smtp.starttls.enable=true
@@ -165,8 +165,8 @@ README.md
 
 ## Liên Hệ
 
-- **Email**: nguyenthanhan26.qngai@gmail.com
-- **GitHub**: https://github.com/ThanhAn333/Social_Network_Project
+- **Email**: anhtht.1802@gmail.com
+- **GitHub**: https://github.com/theanhtran18/Social_Network_Project-BE
 
 ## Giấy Phép
 
